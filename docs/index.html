@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PTCG VAULT — 寶可夢卡牌資料庫</title>
+  <meta name="description" content="PTCG VAULT 寶可夢卡牌資料庫：依卡包、稀有度、屬性、卡種搜尋與瀏覽卡片。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="hd">
+    <div class="hd__wrap">
+      <div class="hd__brand">
+        <span class="hd__logo" aria-hidden="true">◈</span>
+        <span class="hd__title">PTCG <b>VAULT</b></span>
+      </div>
+      <div class="hd__count" id="hdCount">— 張卡片</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="search">
+      <input id="q" class="search__input" type="search" placeholder="搜尋卡名 / 英文名 / 編號…" autocomplete="off">
+      <div class="filters" id="filters">
+        <label class="filter">
+          <span>卡種</span>
+          <select id="f_category"><option value="">全部</option></select>
+        </label>
+        <label class="filter">
+          <span>屬性</span>
+          <select id="f_type"><option value="">全部</option></select>
+        </label>
+        <label class="filter">
+          <span>稀有度</span>
+          <select id="f_rarity"><option value="">全部</option></select>
+        </label>
+        <label class="filter">
+          <span>卡包</span>
+          <select id="f_set"><option value="">全部</option></select>
+        </label>
+        <label class="filter filter--chk">
+          <input type="checkbox" id="f_holo"><span>只看亮面</span>
+        </label>
+        <button class="filter__reset" id="reset" type="button">清除</button>
+      </div>
+    </section>
+
+    <section class="grid" id="grid" aria-live="polite"></section>
+    <p class="empty" id="empty" hidden>找不到符合條件的卡片。</p>
+  </main>
+
+  <!-- 詳情抽屜 -->
+  <div class="drawer" id="drawer" hidden>
+    <div class="drawer__mask" id="drawerMask"></div>
+    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-label="卡片詳情">
+      <button class="drawer__close" id="drawerClose" aria-label="關閉">✕</button>
+      <div class="drawer__body" id="drawerBody"></div>
+    </aside>
+  </div>
+
+  <footer class="ft">PTCG VAULT · 資料驅動靜態站 · 由後台發布 cards.json</footer>
+
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
