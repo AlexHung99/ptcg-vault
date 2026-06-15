@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/config.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <header class="hd">
@@ -77,6 +79,8 @@
         </div>
         <label class="achk"><input type="checkbox" id="lRemember"><span>記住我</span><a class="alink" href="#">忘記密碼？</a></label>
         <button class="abtn" type="submit">登入</button>
+        <div class="auth__or" id="gDivLogin" hidden><span>或</span></div>
+        <div class="gbtn" id="gLogin"></div>
         <div class="auth__foot">還沒有帳號？<a data-auth="register">立即註冊</a></div>
       </form>
 
@@ -104,6 +108,8 @@
         </div>
         <label class="achk"><input type="checkbox" id="rAgree"><span>我已閱讀並同意<a class="alink" href="#">服務條款</a>與<a class="alink" href="#">隱私權政策</a></span></label>
         <button class="abtn" type="submit">建立帳號</button>
+        <div class="auth__or" id="gDivReg" hidden><span>或</span></div>
+        <div class="gbtn" id="gReg"></div>
         <div class="auth__foot">已有帳號？<a data-auth="login">前往登入</a></div>
       </form>
     </div>

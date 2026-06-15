@@ -171,23 +171,50 @@
   function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
   function authNotice(msg, ok){ var n=$("authNotice"); n.hidden=false; n.className="auth__notice "+(ok?"ok":"err"); n.textContent=msg; }
 
+  // 後端 API（Optimind wsPTAUTH.asmx，ScriptService 回傳 {d:"<json>"}）
+  function api(method, body){
+    var base=(window.PTCG_API_BASE||"").replace(/\/+$/,"");
+    return fetch(base+"/web/Service/wsPTAUTH.asmx/"+method, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})})
+      .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+      .then(function(j){ return JSON.parse(j.d); });
+  }
+  function getMember(){ try{ return JSON.parse(localStorage.getItem("ptcg_member")); }catch(e){ return null; } }
+  function saveSession(res){ localStorage.setItem("ptcg_token",res.token); localStorage.setItem("ptcg_member",JSON.stringify(res.member)); updateAuthUI(); }
+  function clearSession(){ localStorage.removeItem("ptcg_token"); localStorage.removeItem("ptcg_member"); updateAuthUI(); }
+  function updateAuthUI(){
+    var m=getMember(), btn=document.querySelector(".hd__auth"), user=$("hdUser");
+    if(m){
+      if(btn) btn.hidden=true;
+      if(!user){
+        user=document.createElement("div"); user.id="hdUser"; user.className="hd__user";
+        user.innerHTML='<span class="hd__user__name"></span><button class="hd__user__out" type="button">登出</button>';
+        btn.parentNode.appendChild(user);
+        user.querySelector(".hd__user__out").addEventListener("click", function(){ var t=localStorage.getItem("ptcg_token"); if(t) api("Logout",{token:t}).catch(function(){}); clearSession(); showView("home"); });
+      }
+      user.hidden=false; user.querySelector(".hd__user__name").textContent=m.display_name||m.email;
+    } else { if(btn) btn.hidden=false; if(user) user.hidden=true; }
+  }
+  function busy(form,on){ var b=form.querySelector(".abtn"); if(b){ b.disabled=on; b.textContent=on?"處理中…":(form.id==="loginForm"?"登入":"建立帳號"); } }
+
   function initAuth(){
-    // 密碼顯示/隱藏
     document.addEventListener("click", function(e){
       var t=e.target.closest(".apass__t"); if(!t) return;
       var inp=$(t.getAttribute("data-toggle")); if(!inp) return;
       var show=inp.type==="password"; inp.type=show?"text":"password"; t.textContent=show?"隱藏":"顯示";
     });
-    // 登入提交
     $("loginForm").addEventListener("submit", function(e){
       e.preventDefault();
       var em=$("lEmail"), pw=$("lPass"), ok=true;
       ok=setErr(em, validEmail(em.value.trim())?"":"請輸入有效的電子郵件")&&ok;
       ok=setErr(pw, pw.value?"":"請輸入密碼")&&ok;
       if(!ok) return;
-      authNotice("帳號系統建置中：登入功能將於後台串接完成後開放。", true);
+      busy(this,true);
+      api("Login",{email:em.value.trim(),password:pw.value}).then(function(res){
+        busy($("loginForm"),false);
+        if(res.ok){ saveSession(res); authNotice("登入成功，歡迎回來 "+(res.member.display_name||res.member.email)+"！",true); }
+        else authNotice(res.error||"登入失敗",false);
+      }).catch(function(){ busy($("loginForm"),false); authNotice("無法連線會員後端（尚未部署或網路問題）。",false); });
     });
-    // 註冊提交
     $("registerForm").addEventListener("submit", function(e){
       e.preventDefault();
       var nm=$("rName"), em=$("rEmail"), pw=$("rPass"), p2=$("rPass2"), ag=$("rAgree"), ok=true;
@@ -196,9 +223,36 @@
       ok=setErr(pw, pw.value.length>=6?"":"密碼至少 6 碼")&&ok;
       ok=setErr(p2, p2.value===pw.value&&p2.value?"":"兩次密碼不一致")&&ok;
       if(!ok) return;
-      if(!ag.checked){ authNotice("請先勾選同意服務條款與隱私權政策。", false); return; }
-      authNotice("帳號系統建置中：註冊功能將於後台串接完成後開放。", true);
+      if(!ag.checked){ authNotice("請先勾選同意服務條款與隱私權政策。",false); return; }
+      busy(this,true);
+      api("Register",{email:em.value.trim(),password:pw.value,display_name:nm.value.trim(),phone:"",captcha:""}).then(function(res){
+        busy($("registerForm"),false);
+        if(res.ok){ saveSession(res); authNotice("註冊成功，歡迎加入 "+(res.member.display_name||res.member.email)+"！",true); }
+        else authNotice(res.error||"註冊失敗",false);
+      }).catch(function(){ busy($("registerForm"),false); authNotice("無法連線會員後端（尚未部署或網路問題）。",false); });
     });
+    initGoogle();
+    restoreSession();
+  }
+
+  function initGoogle(){
+    var cid=window.PTCG_GOOGLE_CLIENT_ID; if(!cid) return;
+    $("gDivLogin").hidden=false; $("gDivReg").hidden=false;
+    (function render(n){
+      if(window.google && google.accounts && google.accounts.id){
+        google.accounts.id.initialize({ client_id:cid, callback:onGoogle });
+        ["gLogin","gReg"].forEach(function(id){ var c=$(id); if(c) google.accounts.id.renderButton(c,{theme:"filled_black",size:"large",text:"continue_with",shape:"pill",width:300}); });
+      } else if(n<40) setTimeout(function(){ render(n+1); },200);
+    })(0);
+  }
+  function onGoogle(resp){
+    api("LoginWithGoogle",{idToken:resp.credential}).then(function(res){
+      if(res.ok){ saveSession(res); showView("home"); } else authNotice(res.error||"Google 登入失敗",false);
+    }).catch(function(){ authNotice("無法連線會員後端（尚未部署）。",false); });
+  }
+  function restoreSession(){
+    var t=localStorage.getItem("ptcg_token"); updateAuthUI(); if(!t) return;
+    api("Me",{token:t}).then(function(res){ if(res.ok&&res.member){ localStorage.setItem("ptcg_member",JSON.stringify(res.member)); updateAuthUI(); } else clearSession(); }).catch(function(){});
   }
 
   function bind(){
