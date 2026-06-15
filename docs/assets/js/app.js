@@ -10,7 +10,21 @@
   var EL_ZH = { grass:"草", fire:"火", water:"水", lightning:"雷", psychic:"超", fighting:"鬥", darkness:"惡", metal:"鋼", dragon:"龍", colorless:"無色", fairy:"妖精" };
   var CAT_ZH = { pokemon:"寶可夢", supporter:"支援者", item:"物品", tool:"寶可夢道具", Fossil:"化石" };
   var STAGE_ZH = { basic:"基礎", "1":"一階", "2":"二階", "0":"" };
-  var RAR_SYM = { C:"◆", U:"◆◆", R:"◆◆◆", RR:"◆◆◆◆", AR:"★", SR:"★★", SAR:"★★★", IM:"◈", S:"✦", SSR:"✦✦", UR:"♛" };
+  // 稀有度分層（對齊原型 PTCGP：鑽石/星星/亮星/皇冠/PROMO，SAR 與 IM 同為 3 星）
+  var RARITY_TIERS = [
+    { key:"d1", sym:"◆",    codes:["C"] },
+    { key:"d2", sym:"◆◆",   codes:["U"] },
+    { key:"d3", sym:"◆◆◆",  codes:["R"] },
+    { key:"d4", sym:"◆◆◆◆", codes:["RR"] },
+    { key:"s1", sym:"★",    codes:["AR"] },
+    { key:"s2", sym:"★★",   codes:["SR"] },
+    { key:"s3", sym:"★★★",  codes:["SAR","IM"] },
+    { key:"sh1", sym:"✦",   codes:["S"] },
+    { key:"sh2", sym:"✦✦",  codes:["SSR"] },
+    { key:"crown", sym:"♛", codes:["UR"] },
+    { key:"promo", sym:"PROMO", promo:true }
+  ];
+  var RAR_BY_CODE = {}; RARITY_TIERS.forEach(function(t){ (t.codes||[]).forEach(function(c){ RAR_BY_CODE[c]=t; }); });
 
   var CATF = [
     { k:"pokemon", label:"寶可夢", f:function(c){return c.cat==="pokemon";} },
@@ -23,7 +37,6 @@
     { k:"fossil", label:"化石", f:function(c){return c.cat==="Fossil";} }
   ];
   var ELS = [["grass","草"],["fire","火"],["water","水"],["lightning","雷"],["psychic","超"],["fighting","鬥"],["darkness","惡"],["metal","鋼"],["dragon","龍"],["colorless","無"]];
-  var RARS = ["C","U","R","RR","AR","SR","SAR","IM","S","SSR","UR"];
 
   var $ = function(id){ return document.getElementById(id); };
   var DATA = { sets:[], cards:[] }, SETMAP = {}, CARDMAP = {};
@@ -32,7 +45,7 @@
 
   function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
   function elZh(e){ return EL_ZH[e]||e||""; }
-  function rarSym(r){ return RAR_SYM[r]||r||""; }
+  function rarSym(r){ var t=RAR_BY_CODE[r]; return t?t.sym:(r||""); }
   function any(o){ for(var k in o){ if(o[k]) return true; } return false; }
 
   function imgTag(c){
@@ -68,7 +81,7 @@
       if(F.set && c.set!==F.set) return false;
       if(hasCat && !CATF.some(function(cf){ return F.cats[cf.k] && cf.f(c); })) return false;
       if(hasEl && !F.els[c.el]) return false;
-      if(hasRar && !F.rars[c.rarity]) return false;
+      if(hasRar){ var rt=RAR_BY_CODE[c.rarity]; if(!((rt&&F.rars[rt.key]) || (F.rars.promo && /^PROMO/.test(c.set)))) return false; }
       if(q){ var hay=((c.zh||"")+" "+(c.en||"")+" "+(c.ja||"")+" "+(c.id||"")).toLowerCase(); if(hay.indexOf(q)===-1) return false; }
       return true;
     });
@@ -86,7 +99,7 @@
     function grp(lab, pills){ return '<div class="fgroup"><span class="fgroup__lab">'+lab+'</span>'+pills+'</div>'; }
     var cat = CATF.map(function(cf){ return '<button class="pill'+(cf.cls?" "+cf.cls:"")+'" data-g="cats" data-k="'+cf.k+'">'+esc(cf.label)+'</button>'; }).join("");
     var el  = ELS.map(function(e){ return '<button class="pill" data-g="els" data-k="'+e[0]+'"><i class="dot e-'+e[0]+'" style="width:9px;height:9px;border-radius:50%"></i>'+e[1]+'</button>'; }).join("");
-    var rar = RARS.map(function(r){ return '<button class="pill pill--rar" data-g="rars" data-k="'+r+'">'+rarSym(r)+'</button>'; }).join("");
+    var rar = RARITY_TIERS.map(function(t){ return '<button class="pill pill--rar" data-g="rars" data-k="'+t.key+'">'+t.sym+'</button>'; }).join("");
     $("fbar").innerHTML = grp("卡種", cat) + grp("屬性", el) + grp("稀有度", rar);
   }
 
@@ -133,7 +146,7 @@
       '<div class="dv__chips">'+
         (c.el?'<span class="dv__chip"><i class="dot e-'+esc(c.el)+'" style="width:9px;height:9px;border-radius:50%"></i>'+esc(elZh(c.el))+'</span>':'')+
         '<span class="dv__chip">'+esc(c.cat==="pokemon"?"寶可夢":(CAT_ZH[c.cat]||"訓練家"))+'</span>'+
-        '<span class="dv__chip" style="color:#f4be1b">'+rarSym(c.rarity)+' '+esc(c.rarity)+'</span>'+
+        '<span class="dv__chip" style="color:#f4be1b" title="'+esc(c.rarity)+'">'+rarSym(c.rarity)+'</span>'+
       '</div>'+
       '<dl class="dv__rows">'+
         row("編號", c.id)+ row("系列", (s?s.name+" ("+c.set+")":c.set))+
