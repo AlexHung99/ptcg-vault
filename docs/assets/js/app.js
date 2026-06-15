@@ -148,7 +148,7 @@
 
   /* ---------- view 切換 ---------- */
   function showView(v){
-    ["home","lib","deck"].forEach(function(x){ $("view-"+x).classList.toggle("is-active", x===v); });
+    ["home","lib","deck","auth"].forEach(function(x){ $("view-"+x).classList.toggle("is-active", x===v); });
     [].forEach.call(document.querySelectorAll(".hd__tab"), function(t){ t.classList.toggle("is-active", t.getAttribute("data-view")===v); });
     window.scrollTo(0,0);
   }
@@ -156,9 +156,55 @@
     F.set = code; setActiveChip(code); applyFilters(); showView("lib");
   }
 
+  /* ---------- 登入 / 註冊 ---------- */
+  function setAuthTab(which){
+    ["login","register"].forEach(function(w){
+      document.querySelector('.auth__tab[data-auth="'+w+'"]').classList.toggle("is-active", w===which);
+      $(w+"Form").classList.toggle("is-active", w===which);
+    });
+    $("authNotice").hidden = true;
+  }
+  function setErr(input, msg){
+    var f=input.closest(".afield"); if(f){ f.classList.toggle("bad", !!msg); var e=f.querySelector(".aerr"); if(e) e.textContent=msg||""; }
+    return !msg;
+  }
+  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function authNotice(msg, ok){ var n=$("authNotice"); n.hidden=false; n.className="auth__notice "+(ok?"ok":"err"); n.textContent=msg; }
+
+  function initAuth(){
+    // 密碼顯示/隱藏
+    document.addEventListener("click", function(e){
+      var t=e.target.closest(".apass__t"); if(!t) return;
+      var inp=$(t.getAttribute("data-toggle")); if(!inp) return;
+      var show=inp.type==="password"; inp.type=show?"text":"password"; t.textContent=show?"隱藏":"顯示";
+    });
+    // 登入提交
+    $("loginForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      var em=$("lEmail"), pw=$("lPass"), ok=true;
+      ok=setErr(em, validEmail(em.value.trim())?"":"請輸入有效的電子郵件")&&ok;
+      ok=setErr(pw, pw.value?"":"請輸入密碼")&&ok;
+      if(!ok) return;
+      authNotice("帳號系統建置中：登入功能將於後台串接完成後開放。", true);
+    });
+    // 註冊提交
+    $("registerForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      var nm=$("rName"), em=$("rEmail"), pw=$("rPass"), p2=$("rPass2"), ag=$("rAgree"), ok=true;
+      ok=setErr(nm, nm.value.trim()?"":"請輸入暱稱")&&ok;
+      ok=setErr(em, validEmail(em.value.trim())?"":"請輸入有效的電子郵件")&&ok;
+      ok=setErr(pw, pw.value.length>=6?"":"密碼至少 6 碼")&&ok;
+      ok=setErr(p2, p2.value===pw.value&&p2.value?"":"兩次密碼不一致")&&ok;
+      if(!ok) return;
+      if(!ag.checked){ authNotice("請先勾選同意服務條款與隱私權政策。", false); return; }
+      authNotice("帳號系統建置中：註冊功能將於後台串接完成後開放。", true);
+    });
+  }
+
   function bind(){
     // nav + 任何 data-view
     document.addEventListener("click", function(e){
+      var au = e.target.closest("[data-auth]"); if(au){ setAuthTab(au.getAttribute("data-auth")); return; }
       var v = e.target.closest("[data-view]"); if(v){ showView(v.getAttribute("data-view")); return; }
       var gs = e.target.closest("[data-go-set]"); if(gs){ goSet(gs.getAttribute("data-go-set")); return; }
     });
@@ -184,7 +230,7 @@
       d.sets.forEach(function(s){ SETMAP[s.code]=s; });
       d.cards.forEach(function(c){ CARDMAP[c.id]=c; });
       $("ftTotal").textContent = d.total.toLocaleString();
-      buildHome(); buildSets(); buildFbar(); bind();
+      buildHome(); buildSets(); buildFbar(); bind(); initAuth();
       view = DATA.cards.slice(); renderPage(true);
     })
     .catch(function(err){ $("view-home").innerHTML='<p class="empty">讀取 cards.json 失敗：'+esc(err.message)+'</p>'; });

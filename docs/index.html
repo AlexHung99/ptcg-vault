@@ -21,6 +21,7 @@
         <button class="hd__tab" data-view="lib">卡庫</button>
         <button class="hd__tab" data-view="deck">牌組 &amp; 勝率</button>
       </nav>
+      <button class="hd__auth" data-view="auth">登入 / 註冊</button>
     </div>
   </header>
 
@@ -49,6 +50,62 @@
       <div class="deck__ico">▤</div>
       <h2>牌組 &amp; 勝率</h2>
       <p>登入後可建立 20 張對戰牌組、記錄每場勝率。此功能需要帳號系統，將於後台串接後開放。</p>
+    </div>
+  </main>
+
+  <!-- 登入 / 註冊 -->
+  <main class="view view--auth" id="view-auth">
+    <div class="auth">
+      <div class="auth__brand"><span class="hd__logo">PCTG</span><span class="hd__logo2">VAULT</span></div>
+      <div class="auth__tabs">
+        <button class="auth__tab is-active" data-auth="login">登入</button>
+        <button class="auth__tab" data-auth="register">註冊</button>
+      </div>
+      <div class="auth__notice" id="authNotice" hidden></div>
+
+      <!-- 登入 -->
+      <form class="auth__form is-active" id="loginForm" novalidate>
+        <div class="afield">
+          <label for="lEmail">電子郵件</label>
+          <input id="lEmail" type="email" autocomplete="email" placeholder="you@example.com">
+          <small class="aerr"></small>
+        </div>
+        <div class="afield">
+          <label for="lPass">密碼</label>
+          <div class="apass"><input id="lPass" type="password" autocomplete="current-password" placeholder="輸入密碼"><button type="button" class="apass__t" data-toggle="lPass">顯示</button></div>
+          <small class="aerr"></small>
+        </div>
+        <label class="achk"><input type="checkbox" id="lRemember"><span>記住我</span><a class="alink" href="#">忘記密碼？</a></label>
+        <button class="abtn" type="submit">登入</button>
+        <div class="auth__foot">還沒有帳號？<a data-auth="register">立即註冊</a></div>
+      </form>
+
+      <!-- 註冊 -->
+      <form class="auth__form" id="registerForm" novalidate>
+        <div class="afield">
+          <label for="rName">暱稱</label>
+          <input id="rName" type="text" autocomplete="nickname" placeholder="你的暱稱">
+          <small class="aerr"></small>
+        </div>
+        <div class="afield">
+          <label for="rEmail">電子郵件</label>
+          <input id="rEmail" type="email" autocomplete="email" placeholder="you@example.com">
+          <small class="aerr"></small>
+        </div>
+        <div class="afield">
+          <label for="rPass">密碼</label>
+          <div class="apass"><input id="rPass" type="password" autocomplete="new-password" placeholder="至少 6 碼"><button type="button" class="apass__t" data-toggle="rPass">顯示</button></div>
+          <small class="aerr"></small>
+        </div>
+        <div class="afield">
+          <label for="rPass2">確認密碼</label>
+          <input id="rPass2" type="password" autocomplete="new-password" placeholder="再次輸入密碼">
+          <small class="aerr"></small>
+        </div>
+        <label class="achk"><input type="checkbox" id="rAgree"><span>我已閱讀並同意<a class="alink" href="#">服務條款</a>與<a class="alink" href="#">隱私權政策</a></span></label>
+        <button class="abtn" type="submit">建立帳號</button>
+        <div class="auth__foot">已有帳號？<a data-auth="login">前往登入</a></div>
+      </form>
     </div>
   </main>
 
