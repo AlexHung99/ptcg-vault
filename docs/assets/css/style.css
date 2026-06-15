@@ -35,7 +35,21 @@ button{font-family:inherit}
 
 /* ---------- HOME ---------- */
 .hero{position:relative;border:1px solid var(--line2);border-radius:18px;padding:32px 34px;margin-bottom:18px;overflow:hidden;
+  display:flex;align-items:center;gap:24px;
   background:linear-gradient(135deg,rgba(58,160,240,.12),rgba(177,95,208,.12)),var(--panel)}
+.hero__main{flex:1 1 auto;min-width:0}
+.hero__cards{flex:0 0 auto;position:relative;width:330px;height:248px;display:flex;align-items:center;justify-content:center}
+.hero__cards .hc{position:absolute;width:136px;aspect-ratio:367/512;border-radius:11px;overflow:hidden;border:1px solid var(--line2);
+  background:var(--bg2);box-shadow:0 14px 34px rgba(0,0,0,.55);cursor:pointer;transition:transform .22s}
+.hero__cards .hc img{width:100%;height:100%;object-fit:contain}
+.hero__cards .hc .gc__ph{position:absolute;inset:0}
+.hero__cards .hc:nth-child(1){transform:rotate(-13deg) translate(-86px,12px)}
+.hero__cards .hc:nth-child(2){transform:translateY(-10px);z-index:3}
+.hero__cards .hc:nth-child(3){transform:rotate(13deg) translate(86px,12px)}
+.hero__cards .hc:nth-child(1):hover{transform:rotate(-13deg) translate(-86px,2px)}
+.hero__cards .hc:nth-child(2):hover{transform:translateY(-20px)}
+.hero__cards .hc:nth-child(3):hover{transform:rotate(13deg) translate(86px,2px)}
+@media(max-width:900px){ .hero__cards{display:none} }
 .hero__tag{display:inline-flex;align-items:center;gap:7px;font:12px/1 var(--mono);color:var(--blue);margin-bottom:14px}
 .hero__tag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)}
 .hero__title{font-family:var(--mono);font-size:44px;font-weight:700;line-height:1.04;letter-spacing:.5px;margin-bottom:10px}

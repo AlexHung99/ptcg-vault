@@ -111,16 +111,19 @@
     var feats = DATA.cards.filter(function(c){return c.set===s.code&&(c.klass==="ex"||c.klass==="mega");}).slice(0,6);
     var html =
       '<section class="hero">'+
-        '<div class="hero__tag">最新系列 · '+esc(s.code)+'</div>'+
-        '<h1 class="hero__title">'+esc(s.name)+'</h1>'+
-        '<p class="hero__desc">瀏覽 '+esc(s.code)+' 系列完整卡牌，依屬性、卡類、稀有度快速查找，並組成你的 20 張對戰牌組。</p>'+
-        '<div class="hero__stats">'+
-          '<div class="hero__stat"><b>'+s.count+'</b><span>收錄卡牌</span></div>'+
-          '<div class="hero__stat"><b>'+exc+'</b><span>EX 卡</span></div>'+
-          '<div class="hero__stat"><b>'+meg+'</b><span>MEGA 卡</span></div>'+
+        '<div class="hero__main">'+
+          '<div class="hero__tag">最新系列 · '+esc(s.code)+'</div>'+
+          '<h1 class="hero__title">'+esc(s.name)+'</h1>'+
+          '<p class="hero__desc">瀏覽 '+esc(s.code)+' 系列完整卡牌，依屬性、卡類、稀有度快速查找，並組成你的 20 張對戰牌組。</p>'+
+          '<div class="hero__stats">'+
+            '<div class="hero__stat"><b>'+s.count+'</b><span>收錄卡牌</span></div>'+
+            '<div class="hero__stat"><b>'+exc+'</b><span>EX 卡</span></div>'+
+            '<div class="hero__stat"><b>'+meg+'</b><span>MEGA 卡</span></div>'+
+          '</div>'+
+          '<div class="hero__cta"><button class="btn btn--p" data-go-set="'+esc(s.code)+'">瀏覽整個系列 →</button>'+
+            '<button class="btn" data-view="lib">搜尋卡牌</button></div>'+
         '</div>'+
-        '<div class="hero__cta"><button class="btn btn--p" data-go-set="'+esc(s.code)+'">瀏覽整個系列 →</button>'+
-          '<button class="btn" data-view="lib">搜尋卡牌</button></div>'+
+        '<div class="hero__cards">'+ feats.slice(0,3).map(function(c){ return '<div class="hc" data-id="'+esc(c.id)+'">'+imgTag(c)+'</div>'; }).join("") +'</div>'+
       '</section>'+
       '<section class="feat">'+
         '<div class="fcard" data-view="lib"><div class="fcard__ic">⌕</div><div><div class="fcard__t">搜尋卡牌</div><div class="fcard__s">依屬性、卡類、稀有度、系列查找 '+DATA.total.toLocaleString()+' 張卡</div></div></div>'+
@@ -285,7 +288,7 @@
     $("clearF").addEventListener("click", function(){ F={set:"",q:"",cats:{},els:{},rars:{}}; $("q").value=""; setActiveChip(""); [].forEach.call(document.querySelectorAll(".pill.on"),function(p){p.classList.remove("on");}); applyFilters(); });
     $("moreBtn").addEventListener("click", function(){ renderPage(false); });
     // 卡片點擊（事件委派，涵蓋首頁亮點與卡庫）
-    document.addEventListener("click", function(e){ var c=e.target.closest(".gc"); if(c) openDrawer(c.getAttribute("data-id")); });
+    document.addEventListener("click", function(e){ var c=e.target.closest(".gc, .hc"); if(c) openDrawer(c.getAttribute("data-id")); });
     $("dwClose").addEventListener("click", closeDrawer); $("dwMask").addEventListener("click", closeDrawer);
     document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeDrawer(); });
   }
