@@ -3,64 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PTCG VAULT — 寶可夢卡牌資料庫</title>
-  <meta name="description" content="PTCG VAULT 寶可夢卡牌資料庫：依卡包、稀有度、屬性、卡種搜尋與瀏覽卡片。">
+  <title>PCTG VAULT — 寶可夢卡牌資料庫</title>
+  <meta name="description" content="PCTG VAULT：寶可夢 Pocket 卡牌圖鑑，3406 張卡，依系列、屬性、卡類、稀有度搜尋瀏覽。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
   <header class="hd">
     <div class="hd__wrap">
-      <div class="hd__brand">
-        <span class="hd__logo" aria-hidden="true">◈</span>
-        <span class="hd__title">PTCG <b>VAULT</b></span>
-      </div>
-      <div class="hd__count" id="hdCount">— 張卡片</div>
+      <a class="hd__brand" href="#" data-view="home">
+        <span class="hd__logo">PCTG</span><span class="hd__logo2">VAULT</span>
+      </a>
+      <nav class="hd__nav">
+        <button class="hd__tab is-active" data-view="home">首頁</button>
+        <button class="hd__tab" data-view="lib">卡庫</button>
+        <button class="hd__tab" data-view="deck">牌組 &amp; 勝率</button>
+      </nav>
     </div>
   </header>
 
-  <main class="main">
+  <!-- 首頁 -->
+  <main class="view view--home is-active" id="view-home"></main>
+
+  <!-- 卡庫 -->
+  <main class="view" id="view-lib">
     <section class="search">
-      <input id="q" class="search__input" type="search" placeholder="搜尋卡名 / 英文名 / 編號…" autocomplete="off">
-      <div class="filters" id="filters">
-        <label class="filter">
-          <span>卡種</span>
-          <select id="f_category"><option value="">全部</option></select>
-        </label>
-        <label class="filter">
-          <span>屬性</span>
-          <select id="f_type"><option value="">全部</option></select>
-        </label>
-        <label class="filter">
-          <span>稀有度</span>
-          <select id="f_rarity"><option value="">全部</option></select>
-        </label>
-        <label class="filter">
-          <span>卡包</span>
-          <select id="f_set"><option value="">全部</option></select>
-        </label>
-        <label class="filter filter--chk">
-          <input type="checkbox" id="f_holo"><span>只看亮面</span>
-        </label>
-        <button class="filter__reset" id="reset" type="button">清除</button>
+      <div class="search__box">
+        <span class="search__ico">⌕</span>
+        <input id="q" type="search" placeholder="搜尋卡名（中／英／日）或編號…" autocomplete="off">
       </div>
     </section>
-
+    <section class="sets" id="sets"></section>
+    <section class="fbar" id="fbar"></section>
+    <div class="fbar__meta"><span id="resultN"></span><button id="clearF" class="fclear" type="button">清除篩選</button></div>
     <section class="grid" id="grid" aria-live="polite"></section>
+    <div class="more" id="more" hidden><button id="moreBtn" type="button">載入更多</button></div>
     <p class="empty" id="empty" hidden>找不到符合條件的卡片。</p>
   </main>
 
+  <!-- 牌組 & 勝率 -->
+  <main class="view" id="view-deck">
+    <div class="deck__lock">
+      <div class="deck__ico">▤</div>
+      <h2>牌組 &amp; 勝率</h2>
+      <p>登入後可建立 20 張對戰牌組、記錄每場勝率。此功能需要帳號系統，將於後台串接後開放。</p>
+    </div>
+  </main>
+
   <!-- 詳情抽屜 -->
-  <div class="drawer" id="drawer" hidden>
-    <div class="drawer__mask" id="drawerMask"></div>
-    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-label="卡片詳情">
-      <button class="drawer__close" id="drawerClose" aria-label="關閉">✕</button>
-      <div class="drawer__body" id="drawerBody"></div>
+  <div class="dw" id="drawer" hidden>
+    <div class="dw__mask" id="dwMask"></div>
+    <aside class="dw__panel" role="dialog" aria-modal="true" aria-label="卡片詳情">
+      <button class="dw__close" id="dwClose" aria-label="關閉">✕</button>
+      <div class="dw__body" id="dwBody"></div>
     </aside>
   </div>
 
-  <footer class="ft">PTCG VAULT · 資料驅動靜態站 · 由後台發布 cards.json</footer>
+  <footer class="ft">PCTG VAULT · 寶可夢 Pocket 卡牌圖鑑 · 資料 <span id="ftTotal">—</span> 張</footer>
 
   <script src="assets/js/app.js" defer></script>
 </body>
