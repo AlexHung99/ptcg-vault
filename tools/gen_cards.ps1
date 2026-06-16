@@ -32,8 +32,8 @@ foreach ($c in $cards) {
   $p = $pmap[[string]$c.id]
   $cat = [string]$c.type
   if (-not $cat -and $p) { $cat = [string]$p.cat }
-  $el = [string]$c.element
-  if (-not $el -and $p -and $p.type) { $el = [string]$p.type }
+  $el = ([string]$c.element).ToLower()
+  if (-not $el -and $p -and $p.type) { $el = ([string]$p.type).ToLower() }
   $klass = if ($p -and $p.klass) { [string]$p.klass } else { Get-Klass $en }
 
   $o = [ordered]@{
@@ -41,7 +41,7 @@ foreach ($c in $cards) {
     zh=[string]$c.name.zh; en=$en; ja=[string]$c.name.ja
     rarity=[string]$c.rarity; klass=$klass
     el=$el; cat=$cat; stage="$($c.stage)"
-    hp=$c.health; rc=$c.retreatCost; weak=[string]$c.weakness; ef=[string]$c.evolvesFrom
+    hp=$c.health; rc=$c.retreatCost; weak=([string]$c.weakness).ToLower(); ef=[string]$c.evolvesFrom
     packs=@($c.packs); img="$set/$num.webp"
   }
   $out.Add($o)
