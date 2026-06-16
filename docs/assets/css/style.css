@@ -82,15 +82,24 @@ button{font-family:inherit}
 .search input::placeholder{color:var(--ink3)}
 .search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(58,160,240,.18)}
 
-.sets{display:flex;gap:9px;overflow-x:auto;padding:4px 2px 12px;margin-bottom:4px;scrollbar-width:thin}
-.sets::-webkit-scrollbar{height:6px}.sets::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
-.chip{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:9px 13px;background:var(--panel);border:1px solid var(--line2);border-radius:11px;cursor:pointer;white-space:nowrap;transition:border-color .15s,background .15s}
+/* 卡庫 2 欄：左卡包清單 + 右內容 */
+.lib{display:flex;gap:20px;align-items:flex-start}
+.lib__side{flex:0 0 250px;position:sticky;top:68px;max-height:calc(100vh - 92px);overflow-y:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:8px;scrollbar-width:thin}
+.lib__side::-webkit-scrollbar{width:6px}.lib__side::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+.lib__sidehd{font:11px/1 var(--mono);color:var(--ink3);padding:8px 10px 6px}
+.lib__main{flex:1;min-width:0}
+.sets{display:flex;flex-direction:column;gap:3px}
+.chip{display:flex;align-items:center;gap:9px;width:100%;padding:9px 11px;background:transparent;border:1px solid transparent;border-radius:10px;cursor:pointer;text-align:left;transition:background .13s,border-color .13s}
 .chip:hover{background:var(--panel2)}
-.chip.is-active{background:linear-gradient(110deg,rgba(58,160,240,.22),rgba(177,95,208,.22));border-color:var(--blue)}
-.chip__code{font:12px/1 var(--mono);font-weight:700;color:var(--blue)}
-.chip__name{font-size:13px;color:var(--ink2);max-width:170px;overflow:hidden;text-overflow:ellipsis}
-.chip__n{font:11px/1 var(--mono);color:var(--ink3)}
+.chip.is-active{background:linear-gradient(110deg,rgba(58,160,240,.2),rgba(177,95,208,.2));border-color:var(--blue)}
+.chip__code{font:12px/1 var(--mono);font-weight:700;color:var(--blue);flex:0 0 auto;min-width:34px}
+.chip__name{font-size:13px;color:var(--ink2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip__n{font:11px/1 var(--mono);color:var(--ink3);flex:0 0 auto}
 .chip.is-active .chip__name{color:var(--ink)}
+@media(max-width:860px){
+  .lib{flex-direction:column}
+  .lib__side{flex:none;width:100%;position:static;max-height:230px}
+}
 
 /* filter pill bar */
 .fbar{display:flex;flex-direction:column;gap:9px;margin:8px 0 4px}

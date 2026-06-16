@@ -32,18 +32,25 @@
 
   <!-- 卡庫 -->
   <main class="view" id="view-lib">
-    <section class="search">
-      <div class="search__box">
-        <span class="search__ico">⌕</span>
-        <input id="q" type="search" placeholder="搜尋卡名（中／英／日）或編號…" autocomplete="off">
+    <div class="lib">
+      <aside class="lib__side">
+        <div class="lib__sidehd">卡包系列</div>
+        <nav class="sets" id="sets"></nav>
+      </aside>
+      <div class="lib__main">
+        <section class="search">
+          <div class="search__box">
+            <span class="search__ico">⌕</span>
+            <input id="q" type="search" placeholder="搜尋卡名（中／英／日）或編號…" autocomplete="off">
+          </div>
+        </section>
+        <section class="fbar" id="fbar"></section>
+        <div class="fbar__meta"><span id="resultN"></span><button id="clearF" class="fclear" type="button">清除篩選</button></div>
+        <section class="grid" id="grid" aria-live="polite"></section>
+        <div class="more" id="more" hidden><button id="moreBtn" type="button">載入更多</button></div>
+        <p class="empty" id="empty" hidden>找不到符合條件的卡片。</p>
       </div>
-    </section>
-    <section class="sets" id="sets"></section>
-    <section class="fbar" id="fbar"></section>
-    <div class="fbar__meta"><span id="resultN"></span><button id="clearF" class="fclear" type="button">清除篩選</button></div>
-    <section class="grid" id="grid" aria-live="polite"></section>
-    <div class="more" id="more" hidden><button id="moreBtn" type="button">載入更多</button></div>
-    <p class="empty" id="empty" hidden>找不到符合條件的卡片。</p>
+    </div>
   </main>
 
   <!-- 牌組 & 勝率 -->
