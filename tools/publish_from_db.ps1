@@ -33,18 +33,22 @@ Write-Host "read from DB: $($cards.Count) cards"
 # packs: turn 'placeholder' sentinel back to empty
 foreach ($c in $cards) { if ($c.packs.Count -eq 1 -and $c.packs[0] -eq 'placeholder') { $c.packs = @() } }
 
-# derive sets (code,name,count) from packs, newest-first
-$setPacks = @{}; $setCount = @{}
-foreach ($c in $cards) {
-  $s = [string]$c.set
-  if (-not $setCount.ContainsKey($s)) { $setCount[$s]=0; $setPacks[$s]=New-Object System.Collections.Generic.List[string] }
-  $setCount[$s]++
-  foreach ($p in $c.packs) { if ($p -and $setPacks[$s] -notcontains $p) { $setPacks[$s].Add([string]$p) } }
-}
-$order = @('B3a','B3','B2b','B2a','B2','B1a','B1','A4b','A4a','A4','A3b','A3a','A3','A2b','A2a','A2','A1a','A1','PROMO-B','PROMO-A')
+# count cards per set
+$setCount = @{}
+foreach ($c in $cards) { $s=[string]$c.set; if ($setCount.ContainsKey($s)) { $setCount[$s]++ } else { $setCount[$s]=1 } }
+
+# set names/order from b_ptcg_set
+$env:PGPASSWORD = 'Alex@168'
+$tmp2 = Join-Path $env:TEMP ("ptcg_sets_" + [Guid]::NewGuid().ToString("N") + ".json")
+& $PsqlExe -h 127.0.0.1 -p 5433 -U postgres -d optimind_mix -tA -o $tmp2 -c "SELECT json_agg(json_build_object('code',set_code,'name',COALESCE(NULLIF(set_name,''),set_code),'ord',release_order) ORDER BY release_order, set_code) FROM public.b_ptcg_set WHERE is_deleted=false AND company_uid='$Company';" | Out-Null
+$env:PGPASSWORD = $null
+$setMeta = (Get-Content -Raw -Encoding UTF8 $tmp2) | ConvertFrom-Json
+Remove-Item $tmp2 -ErrorAction SilentlyContinue
+$metaCodes = @($setMeta | ForEach-Object { [string]$_.code })
+
 $sets = New-Object System.Collections.Generic.List[object]
-foreach ($code in $order) { if ($setCount.ContainsKey($code)) { $sets.Add([ordered]@{ code=$code; name=($setPacks[$code] -join $SEP); count=$setCount[$code] }) } }
-foreach ($code in $setCount.Keys) { if ($order -notcontains $code) { $sets.Add([ordered]@{ code=$code; name=($setPacks[$code] -join $SEP); count=$setCount[$code] }) } }
+foreach ($s in $setMeta) { $code=[string]$s.code; if ($setCount.ContainsKey($code)) { $sets.Add([ordered]@{ code=$code; name=[string]$s.name; count=$setCount[$code] }) } }
+foreach ($code in $setCount.Keys) { if ($metaCodes -notcontains $code) { $sets.Add([ordered]@{ code=$code; name=$code; count=$setCount[$code] }) } }
 
 $payload = [ordered]@{ generated=(Get-Date).ToString("s"); total=$cards.Count; sets=$sets; cards=$cards }
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
